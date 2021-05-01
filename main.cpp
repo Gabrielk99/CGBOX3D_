@@ -769,6 +769,7 @@ void keyPress(unsigned char key,int x,int y){
             camAngle=90;
             changeCamera(GLUT_WINDOW_WIDTH,GLUT_WINDOW_HEIGHT);
             fim=!fim;
+            noturno=false;
         }
         break;
     case 27:
