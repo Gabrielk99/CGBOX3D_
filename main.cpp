@@ -763,10 +763,12 @@ void keyPress(unsigned char key,int x,int y){
         if(fim){
             jogador.reset();
             inimigo.reset();
-            fim=!fim;
-            help=!help;
+            help=true;
             toggleCam=0;
-            IAactive=!IAactive;
+            IAactive=false;
+            camAngle=90;
+            changeCamera(GLUT_WINDOW_WIDTH,GLUT_WINDOW_HEIGHT);
+            fim=!fim;
         }
         break;
     case 27:
