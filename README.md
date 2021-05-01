@@ -11,4 +11,6 @@ Make all
 
 execute with
 
-./game /your_directory/arena_2.svg
+g++ : ./game /your_directory/arena_2.svg
+
+make all : ./trabalhocg /your_directory/arena_2.svg
