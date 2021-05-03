@@ -419,7 +419,7 @@ void imprimeRules(float x,float y){
         glutBitmapCharacter(font,*tmpStr);
         tmpStr++;
     }
-    sprintf(str,"R - Reseta game");
+    sprintf(str,"R - Reseta game depois de finalizado");
     tmpStr=str;
     glRasterPos2f(x,y+0.45);
     while(*tmpStr){
