@@ -336,7 +336,7 @@ void imprimeHelp (float x,float y){
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glDisable(GL_TEXTURE_2D);
-    glColor3f(1,0,1);
+    glColor3f(1,1,0);
     char*tmpStr;
     sprintf(str,"HELP");
     tmpStr=str;
@@ -356,7 +356,7 @@ void imprimeRules(float x,float y){
     glDisable(GL_TEXTURE_2D);
     glColor3f(1,1,1);
     char*tmpStr;
-    sprintf(str,"H - Pausa o jogo e mostra teclas");
+    sprintf(str,"H - Pausa/Despausa o jogo e mostra teclas");
     tmpStr=str;
     glRasterPos2f(x,y);
     while(*tmpStr){
@@ -449,14 +449,35 @@ void imprimeRules(float x,float y){
     }
     glPopAttrib();
 }
+void desenhaFundoMenu(){
+    glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    //define a cor da mensagem
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glLineWidth(3);
+    glPushMatrix();
+        glBegin(GL_QUADS);
+            glColor4f(1,0,1,0.5);
+            glVertex2f(0.025,0.025);
+            glVertex2f(0.975,0.025);
+            glVertex2f(0.975,0.85);
+            glVertex2f(0.025,0.85);
+        glEnd();
+    glPopMatrix();
+    glPopAttrib();
+}
 //call help 
 void callHelp(){
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
         glLoadIdentity();
         glOrtho(0,1,0,1,-1,1);
+        
         imprimeHelp(0.5,0.8);
-        imprimeRules(0.05,0.1);
+        imprimeRules(0.05,0.15);
+        desenhaFundoMenu();
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
 }
@@ -546,9 +567,9 @@ void renderScene(){
     callPlacar();
 
     if(help) callHelp();
-    
+    if(!fim && !help)   miniMap();
+
     if(!fim) {
-        miniMap();
         redefineLookAt();
     }
     else {
@@ -1254,6 +1275,7 @@ void init(void){
     glEnable(GL_LIGHT0 | GL_LIGHT1 | GL_LIGHT2);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
+    
    // glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
    GLuint tex = loadText("chao.png");

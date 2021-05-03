@@ -8,6 +8,7 @@
 #include "jogador.h"
 #include "inimigo.h"
 #include "SOIL.h"
+
 //invocando o tinyxml2 para leituras do svg
 using namespace tinyxml2;
 using namespace std;
