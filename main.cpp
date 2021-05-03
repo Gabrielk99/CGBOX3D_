@@ -65,10 +65,12 @@ bool activeT=true;
 bool help = true;
 //rotaciona Win
 float angleWin=0;
+//dual camera
+bool dual=false;
 //ImprimePlacar
 static char str[1000];
 void *font = GLUT_BITMAP_9_BY_15;
-void changeCamera(int w,int h);
+void changeCamera(int w,int h,float angle);
 void imprimePlacar(GLfloat x,GLfloat y){
     glPushAttrib(GL_ENABLE_BIT);
         glDisable(GL_LIGHTING);
@@ -447,6 +449,13 @@ void imprimeRules(float x,float y){
         glutBitmapCharacter(font,*tmpStr);
         tmpStr++;
     }
+    sprintf(str,"Y - Camera do inimigo");
+    tmpStr=str;
+    glRasterPos2f(x,y+0.65);
+    while(*tmpStr){
+        glutBitmapCharacter(font,*tmpStr);
+        tmpStr++;
+    }
     glPopAttrib();
 }
 void desenhaFundoMenu(){
@@ -476,7 +485,7 @@ void callHelp(){
         glOrtho(0,1,0,1,-1,1);
         
         imprimeHelp(0.5,0.8);
-        imprimeRules(0.05,0.15);
+        imprimeRules(0.05,0.1);
         desenhaFundoMenu();
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
@@ -532,7 +541,7 @@ void callVictory(){
             imprimeVitoria(0.5,0.85,1,0,1,0);
         }
         else if(inimigo.validBoxer()){
-            imprimeVitoria(0.5,0.9,2,1,0,0);
+            imprimeVitoria(0.5,0.85,2,1,0,0);
         
         }
     glPopMatrix();
@@ -558,6 +567,14 @@ void renderScene(){
     glLoadIdentity();
     //define variáveis para capturar os 
     //parametros da arena
+    if(dual){
+        glViewport(0,200,w1,h1-200);
+        changeCamera(w1,h1-200,camAngle);
+    }
+    else{
+        glViewport(0,0,w1,h1);
+        changeCamera(w1,h1,camAngle);
+    }
     GLdouble largura,comprimento;
     arena.obtemAlturaLargura(largura,comprimento);
     float altura = arena.returnAltura();
@@ -618,7 +635,24 @@ void renderScene(){
 
     //troca as janelas 
     //DrawAxes(0,0,altura/5,largura/5);
-
+    if(dual){
+        glViewport(0,0,(GLsizei)w1,(GLsizei) 200);
+        glLoadIdentity();
+        float eyex,eyey,eyez;
+        inimigo.getEyesPosition(eyex,eyey,eyez);
+        float fx,fy,fz;
+        inimigo.getFocusPosition(fx,fy,fz);
+        changeCamera(w1,200,90);
+        gluLookAt(eyex,eyey,eyez,fx,fy,fz,0,1,0);
+        DesenhaLuz(altura,largura,comprimento);
+        if(arena.validArena()){
+            arena.Desenha();
+        }
+        //verifica se existe jogador
+        jogador.Desenha();
+        //verifica se existe inimigo
+        inimigo.Desenha();
+    }
     glutSwapBuffers();
     glFlush();
 }
@@ -734,21 +768,24 @@ void keyPress(unsigned char key,int x,int y){
             float angle = jogador.returnAngle();
             camXZAngle=angle*180/M_PI;
             camAngle=60;
-            changeCamera(GLUT_WINDOW_WIDTH,GLUT_WINDOW_HEIGHT);
+            if(dual) changeCamera(w1,h1-200,camAngle);
+            else changeCamera(w1,h1,camAngle);
         }
         break;
     case '1':
         if(!fim){
             toggleCam=0;
             camAngle=90;
-            changeCamera(GLUT_WINDOW_WIDTH,GLUT_WINDOW_HEIGHT);
+            if(dual) changeCamera(w1,h1-200,camAngle);
+            else changeCamera(w1,h1,camAngle);
         }
         break;
     case '2':
         if(!fim){
             toggleCam=1;
             camAngle=90;
-            changeCamera(GLUT_WINDOW_WIDTH,GLUT_WINDOW_HEIGHT);
+            if(dual) changeCamera(w1,h1-200,camAngle);
+            else changeCamera(w1,h1,camAngle);
         }
         break;
     case 'j':
@@ -788,10 +825,15 @@ void keyPress(unsigned char key,int x,int y){
             toggleCam=0;
             IAactive=false;
             camAngle=90;
-            changeCamera(GLUT_WINDOW_WIDTH,GLUT_WINDOW_HEIGHT);
+            if(dual) changeCamera(w1,h1-200,camAngle);
+            else changeCamera(w1,h1,camAngle);
             fim=!fim;
             noturno=false;
         }
+        break;
+    case 'y':
+    case 'Y':
+        dual = !dual;
         break;
     case 27:
         exit(0);
@@ -886,7 +928,8 @@ void idle(){
             fim = true;
             noturno=!noturno;
             camAngle=60;
-            changeCamera(GLUT_WINDOW_WIDTH,GLUT_WINDOW_HEIGHT);
+            if(dual) changeCamera(w1,h1-200,camAngle);
+            else changeCamera(w1,h1,camAngle);
             
         }
         else if(inimigo.returnPontuation()==10){
@@ -906,7 +949,8 @@ void idle(){
             fim = true;
             noturno=!noturno;
             camAngle=60;
-            changeCamera(GLUT_WINDOW_WIDTH,GLUT_WINDOW_HEIGHT);
+            if(dual) changeCamera(w1,h1-200,camAngle);
+            else changeCamera(w1,h1,camAngle);
         }
 
         
@@ -1304,15 +1348,15 @@ void init(void){
     
 
 }
-void changeCamera(int w,int h){
+void changeCamera(int w,int h,float angle){
     GLdouble largura,altura;
     arena.obtemAlturaLargura(largura,altura);
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity();
     if (w <= h)
-        gluPerspective (camAngle, (GLfloat)h/(GLfloat)w, 1, altura*largura);
+        gluPerspective (angle, (GLfloat)h/(GLfloat)w, 1, altura*largura);
     else
-        gluPerspective (camAngle, (GLfloat)w/(GLfloat)h, 1, altura*largura);
+        gluPerspective (angle, (GLfloat)w/(GLfloat)h, 1, altura*largura);
     glMatrixMode(GL_MODELVIEW);
     glutPostRedisplay();
 }
@@ -1321,9 +1365,17 @@ void reshape (int w, int h)
   
     //Ajusta o tamanho da tela com a janela de visualizacao
     glViewport (0, 0, (GLsizei) w, (GLsizei) h);
-    changeCamera(w,h);
+    if(dual){ 
+        glViewport (0, 200, (GLsizei) w, (GLsizei) h-200);
+        changeCamera(w,h-200,camAngle);
+    }
+    else {
+        glViewport (0, 0, (GLsizei) w, (GLsizei) h);
+        changeCamera(w,h,camAngle);
+    }
     h1=h;
     w1=w;
+
 }
 
 //função principal
@@ -1337,7 +1389,7 @@ int main (int argc, char* argv[]){
     glutInit(&argc,argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH);
     //Criando janela
-    glutInitWindowSize(view,view);
+    glutInitWindowSize(view,view+200);
     glutInitWindowPosition(150,50);
     glutCreateWindow("Box-Game");
     //Instanciando as callbacks
