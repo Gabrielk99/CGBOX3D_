@@ -829,6 +829,10 @@ void keyPress(unsigned char key,int x,int y){
             else changeCamera(w1,h1,camAngle);
             fim=!fim;
             noturno=false;
+            inimigo.resetanglebracdir();
+            inimigo.resetanglebracesq();
+            jogador.resetanglebracesq();
+            jogador.resetanglebracdir();
         }
         break;
     case 'y':
@@ -1139,7 +1143,6 @@ void idle(){
             float inc_giro_r = inc_giro*M_PI/180;
             //se o angulo que compensa girar é negativo
             //decrementa o angulo atual
-            //inimigo.defineAngle(theta);
             if(angleDiference<0){
                 if((anguloAtual-inc_giro_r*timeDiference)>(anguloAtual+angleDiference)){
                     inimigo.Gira(-inc_giro,timeDiference);
