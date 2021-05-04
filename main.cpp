@@ -66,7 +66,7 @@ bool help = true;
 //rotaciona Win
 float angleWin=0;
 //dual camera
-bool dual=false;
+bool dual=true;
 //ImprimePlacar
 static char str[1000];
 void *font = GLUT_BITMAP_9_BY_15;
