@@ -767,6 +767,7 @@ void keyPress(unsigned char key,int x,int y){
             camDist = jogador.retornaAltura()*1.5;
             float angle = jogador.returnAngle();
             camXZAngle=angle*180/M_PI;
+            camXYAngle=30;
             camAngle=60;
             if(dual) changeCamera(w1,h1-200,camAngle);
             else changeCamera(w1,h1,camAngle);
